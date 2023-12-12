@@ -1,0 +1,219 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  user
+  admin
+}
+
+type Address {
+  address1    String
+  address2    String
+  city        String
+  state       String
+  country     String
+  postal_code String
+  coordinates Float[]
+}
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  firstName     String
+  lastName      String?
+  email         String    @unique
+  phone         String?
+  dob           DateTime?
+  password      String?
+  image         String?
+  address       Address?
+  deviceId      String?
+  distance      Int?
+  wallet        Int?      @default(0)
+  status        Status    @default(active)
+  role          Role      @default(user)
+  connectedId   String?
+  stripeId      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  payments      Payment[]
+  items         Item[]
+  books         Book[]
+  chats         Chat[]
+  ratings       Rating[]
+}
+
+model Account {
+  id                String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String
+  provider          String
+  providerAccountId String
+  type              String?
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Otp {
+  id                String    @id @default(auto()) @map("_id") @db.ObjectId
+  otp               Int
+  phoneEmail        String @unique
+  resendCount       Int @default(0)
+  updatedAt         DateTime  @updatedAt
+}
+
+enum Status {
+  active
+  inactive
+}
+
+enum Type {
+  rent
+  sale
+}
+
+enum PerTime {
+  day
+  hour
+  period
+}
+
+type Location {
+  type         LocationType @default(Point)
+  coordinates  Decimal[]
+}
+
+enum LocationType {
+  Point
+  Polygon
+}
+
+model Item {
+  id                String    @id @default(auto()) @map("_id") @db.ObjectId
+  masterID          String
+  type              Type     @default(rent)
+  title             String
+  description       String
+  price             Int
+  perTime           PerTime   @default(day)
+  status            Status    @default(active)
+  model             String?
+  value             String?
+  deposit           Int?
+  available         Boolean    @default(true)
+  insurance         Boolean    @default(false)
+  extension         String?
+  location          Location  
+  gallery           String[]
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  books             Book[]
+  ratings           Rating[]
+  chats             Chat[]
+  user              User      @relation(fields: [masterID], references: [id], onDelete: Cascade)
+  
+  @@index([location("2dsphere")], map: "location_2dsphere")
+}
+
+enum BookStatus {
+  PendingPayment
+  Scheduling
+  Scanned
+  Conform
+  RentEnd
+  ScannedEnd
+  Completed
+  Rated
+  Refund
+  Cancelled
+  Rejected
+}
+
+model Book {
+  id                String     @id @default(auto()) @map("_id") @db.ObjectId
+  propertyId        String
+  landlordId        String
+  tenantId          String
+  startDate         DateTime   @default(now())
+  endDate           DateTime   @default(now())
+  price             Int        @default(0)
+  deposit           Int        @default(0)
+  insurance         Boolean    @default(false)
+  leaseDuration     String?
+  qrCode            String?
+  paymentIntent     String?
+  status            BookStatus @default(PendingPayment)
+  moveInDate        DateTime   @default(now())
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  item              Item       @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  user              User       @relation(fields: [landlordId], references: [id], onDelete: Cascade)
+}
+
+model Rating {
+  id                String    @id @default(auto()) @map("_id") @db.ObjectId
+  rating            Float     @default(0)
+  description       String
+  itemId            String
+  toId              String
+  fromId            String
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  item              Item      @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  user              User      @relation(fields: [toId], references: [id], onDelete: Cascade)
+}
+
+model Chat {
+  id                String     @id @default(auto()) @map("_id") @db.ObjectId
+  text              String
+  from              String
+  to                String
+  itemId            String
+  readBy            String[]
+  status            Status     @default(active)
+  updatedAt         DateTime   @updatedAt
+  item              Item       @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  user              User       @relation(fields: [from], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id                String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String 
+  type              String    @default("card")
+  refId             String?    
+  amount            Int
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  user              User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Setting {
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  siteName           String
+  siteSlogan         String?
+  siteLogo           String?
+  siteFav            String?
+  siteWatermark      String?
+  primaryColor       String?
+  secondaryColor     String?
+  gradientLeftColor  String?
+  gradientRightColor String?
+  textPrimaryColor   String?
+  textSecondaryColor String?
+  googleAPIKey       String?
+  paymentMethods     String[]
+  stripApi           String?
+}
