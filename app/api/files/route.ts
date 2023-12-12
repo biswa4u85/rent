@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
         if (e.code === "ENOENT") {
             await mkdir(uploadDir, { recursive: true });
         } else {
+            console.log(e)
             return errorResponse("Something went wrong.", 500);
         }
     }
@@ -34,6 +35,7 @@ export async function POST(request: NextRequest) {
         await writeFile(`${uploadDir}/${filename}`, buffer);
         return successResponse({ fileUrl: `${relativeUploadDir}/${filename}` });
     } catch (e) {
+        console.log(e)
         return errorResponse("Something went wrong.", 500);
     }
 }
