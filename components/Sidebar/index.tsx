@@ -10,7 +10,7 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
-  const pathname = usePathname();
+  const pathname: any = usePathname();
 
   const trigger = useRef<any>(null);
   const sidebar = useRef<any>(null);

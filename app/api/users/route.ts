@@ -5,7 +5,6 @@ import { getToken } from "@/libs/getToken";
 import bcryptjs from "bcryptjs";
 
 const resource = "user";
-const subResource = "otp";
 
 export async function GET(request: NextRequest) {
     try {
@@ -48,12 +47,6 @@ export async function POST(request: NextRequest) {
         if (!session) return errorResponse("You are not Not Authorized", 401);
 
         const data = await request.json();
-
-        // Hash password
-        if (data.password) {
-            const salt = await bcryptjs.genSalt(10)
-            data.password = await bcryptjs.hash(data.password, salt)
-        }
         const res = await prisma[resource].create({ data });
         return successResponse(res);
     } catch (error: any) {
@@ -72,9 +65,10 @@ export async function PATCH(request: NextRequest) {
         delete data.edit
 
         // Hash password
-        if (data.password) {
+        if (data.newPassword) {
             const salt = await bcryptjs.genSalt(10)
-            data.password = await bcryptjs.hash(data.password, salt)
+            data.password = await bcryptjs.hash(data.newPassword, salt)
+            delete data.newPassword
         }
 
         const res = await prisma[resource].update({

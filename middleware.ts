@@ -7,31 +7,25 @@ const secret = process.env.NEXTAUTH_SECRET
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
 
-  const isAdminPath = path === '/admin' || path === '/admin/:path*'
-  const isPublicPath = path === '/auth' || path === '/auth/forget-password'
-
   const token = await getToken({ req: request, secret: secret });
+  const isPublicPath = path === '/' || path.startsWith("/auth")
+  const isAdminPath = path === '/admin' || path.startsWith("/admin")
+
+  if (isPublicPath && token) {
+    return NextResponse.redirect(new URL('/admin', request.nextUrl))
+  }
 
   if (isAdminPath && !token) {
     return NextResponse.redirect(new URL('/auth', request.nextUrl))
   }
-
-  if (isPublicPath && token) {
-    return NextResponse.redirect(new URL('/', request.nextUrl))
-  }
-
-  // if (!isPublicPath && !token) {
-  //   return NextResponse.redirect(new URL('/login', request.nextUrl))
-  // }
 
 }
 
 export const config = {
   matcher: [
     '/',
+    '/auth',
     '/admin',
     '/admin/:path*',
-    '/auth',
-    '/auth/forget-password'
   ]
 }

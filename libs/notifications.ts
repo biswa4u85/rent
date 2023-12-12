@@ -1,3 +1,4 @@
+import nodemailer from 'nodemailer';
 import * as AWS from "aws-sdk";
 import { awsKey, awsSecret, awsRegine, s3SendersEmail, arnName } from '@/libs/constants'
 import { errorResponse } from "@/libs/utility";
@@ -21,7 +22,7 @@ export const SendSMS = async (data: any) => {
     }
 }
 
-export const SendEmail = async (data: any) => {
+export const SendEmails = async (data: any) => {
     console.log(data)
     const AWS_SES = {
         accessKeyId: awsKey,
@@ -56,6 +57,28 @@ export const SendEmail = async (data: any) => {
             Source: s3SendersEmail,
         };
         await ses.sendEmail(params).promise();
+    } catch (err) {
+        return errorResponse(err);
+    }
+}
+
+export const SendEmail = async (data: any) => {
+    try {
+        const transport = nodemailer.createTransport({
+            host: "sandbox.smtp.mailtrap.io",
+            port: 2525,
+            auth: {
+                user: "189f9baba59f9b",
+                pass: "d09e604616e707"
+            }
+        });
+        const mailOptions = {
+            from: 'erptechin@gmail.com',
+            to: data.address,
+            subject: data.subject,
+            html: data.body
+        }
+        await transport.sendMail(mailOptions);
     } catch (err) {
         return errorResponse(err);
     }

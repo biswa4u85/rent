@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from "next/image";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "../api/auth/[...nextauth]/route";
+// import { getServerSession } from "next-auth/next";
+// import { authOptions } from "../api/auth/[...nextauth]/route";
 import SiteApis from "@/contexts/SiteApis";
 import { Metadata } from "next";
 
@@ -11,16 +11,16 @@ export const metadata: Metadata = {
 };
 
 const getData = async (): Promise<any> => {
-  const data: any = await getServerSession(authOptions)
+  // const data: any = await getServerSession(authOptions)
   // const response: any = await SiteApis.getDataApi("projects", {}, data?.token);
   // if (!response?.error) {
   //     return response;
   // }
-  return data
+  // return data
 };
 
 const Page = async () => {
-  const data = await getData();
+  // const data = await getData();
   return (
     <div className="bg-white">
       <div className="flex items-center justify-center h-screen">
