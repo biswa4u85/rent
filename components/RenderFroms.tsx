@@ -158,7 +158,7 @@ const FileBox = (props: any) => {
         const handleFileChange = async (event: any) => {
           const response: any = await SiteApis.fileUploadApi("files", event.target.files[0]);
           if (!response?.error) {
-            field.onChange(props.name)(response?.fileUrl);
+            field.onChange(props.name)(response?.url);
           }
         };
 

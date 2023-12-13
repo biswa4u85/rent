@@ -1,10 +1,10 @@
 import { Server } from "socket.io";
 
-const SocketHandler = (req, res) => {
+const SocketHandler = (req:any, res:any) => {
   if (res.socket.server.io) {
     console.log("Socket is already running");
-    res.socket.server.io.on("connection", (socket) => {
-      socket.on("input-change", (msg) => {
+    res.socket.server.io.on("connection", (socket:any) => {
+      socket.on("input-change", (msg:any) => {
         console.log('msg BB ...', msg)
         socket.broadcast.emit("update-input", msg);
       });

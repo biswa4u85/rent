@@ -22,8 +22,7 @@ export const SendSMS = async (data: any) => {
     }
 }
 
-export const SendEmails = async (data: any) => {
-    console.log(data)
+export const SendEmail_AWS = async (data: any) => {
     const AWS_SES = {
         accessKeyId: awsKey,
         secretAccessKey: awsSecret,
@@ -68,8 +67,8 @@ export const SendEmail = async (data: any) => {
             host: "sandbox.smtp.mailtrap.io",
             port: 2525,
             auth: {
-                user: "189f9baba59f9b",
-                pass: "d09e604616e707"
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
             }
         });
         const mailOptions = {
