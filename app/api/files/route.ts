@@ -42,6 +42,7 @@ async function uploadToCloudinary(buffer: any) {
     });
 }
 
+// TODO POST
 export async function GET(request: NextRequest) {
     const formData = await request.formData();
 

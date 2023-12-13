@@ -2,6 +2,8 @@ import prisma from "@/libs/prisma";
 import { NextRequest } from "next/server";
 import { successResponse, errorResponse } from "@/libs/utility";
 import { getToken } from "@/libs/getToken";
+import { PushTemplates } from "@/libs/templates";
+import { PushNotification } from "@/libs/notifications";
 
 const resource = "book";
 
@@ -46,7 +48,12 @@ export async function POST(request: NextRequest) {
         if (!session) return errorResponse("You are not Not Authorized", 401);
 
         const data = await request.json();
-        const res = await prisma[resource].create({ data: { ...data, price: Number(data.price ?? 0), deposit: Number(data.deposit ?? 0) } });
+        const res = await prisma[resource].create({
+            data: { ...data, price: Number(data.price ?? 0), deposit: Number(data.deposit ?? 0) },
+            include: { user: { select: { deviceId: true } } }
+        });
+        data.push = PushTemplates(res, res?.user?.deviceId);
+        PushNotification(data.push)
         return successResponse(res);
     } catch (error: any) {
         errorResponse(error);

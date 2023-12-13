@@ -7,6 +7,30 @@ export const OTPTemplate = (otp: any, phone: any) => {
     }
 }
 
+export const PushTemplates = (type: any, token: any) => {
+    const message = {
+        default: "",
+        APNS: JSON.stringify({
+            aps: {
+                alert: "You have successfully Create the Order!",
+                badge: 1,
+                sound: "default",
+            },
+        }),
+        GCM: JSON.stringify({
+            notification: {
+                title: "Order",
+                body: "You have successfully Create the Order!",
+            },
+        }),
+    };
+
+    return {
+        token,
+        message,
+    };
+}
+
 // All email templates
 const logo = `<img width="200px" src="https://rent-erptech.vercel.app/images/Logo.svg"><br>`;
 export const emailSignature: any = (url: any) => `<br>Warm Regards,<br><b>Team- ${siteName}</b><br>Contact us - +91-00000 00000 <br>${url ? url : "URL: https://rent-erptech.vercel.app"}</body>`;

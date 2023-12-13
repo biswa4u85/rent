@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
             where: filter,
             skip,
             take,
-            include: { user: true, ratings: true }
+            include: { user: { select: { id: true, firstName: true, image: true } }, ratings: true }
         });
         if (!result) return errorResponse("Record Not Found");
         return successResponse(result, counts);
